@@ -1,25 +1,33 @@
+import {
+  AssetCategories,
+  InvestmentSuitability,
+  ManagementApproach,
+  DividendFrequency,
+  MinMax,
+} from "./AvailableOptions";
+
 export interface RequestOptions {
   from?: number;
   size?: number;
-  kind?: Array<string>;
+  kind?: Array<"etf" | "equity">;
   search_text?: string;
   order_by?: string;
   //filters
-  asset_categories?: Array<string>;
+  asset_categories?: Array<AssetCategories>;
   fund_category?: Array<string>;
-  investment_suitability?: Array<string>;
-  management_approach?: Array<string>;
-  dividend_frequency?: Array<string>;
-  fund_size?: { min: string | null; max: string | null };
-  management_fee?: { min: string | null; max: string | null };
-  one_year_return?: { min: string | null; max: string | null };
-  five_year_return?: { min: string | null; max: string | null };
+  investment_suitability?: Array<InvestmentSuitability>;
+  management_approach?: Array<ManagementApproach>;
+  dividend_frequency?: Array<DividendFrequency>;
+  fund_size?: MinMax;
+  management_fee?: MinMax;
+  one_year_return?: MinMax;
+  five_year_return?: MinMax;
 }
 
 export interface RequestData {
   count: number;
   indexed_at: number;
-  results: SearchResult;
+  results: Array<SearchResult>;
 }
 
 export interface SearchResult {
@@ -65,4 +73,5 @@ export interface SearchResult {
   exchange: string;
   one_year_return: string;
   five_year_return: string;
+  [key: string]: any;
 }

@@ -5,12 +5,12 @@ export default function Page() {
   useEffect(() => {
     async function callback() {
       try {
-        const res = await makeRequest({
-          search_text: "gold",
-          from: 0,
+        const response = await makeRequest({
+          // search_text: "gold",
+          from: 1,
           size: 10,
         });
-        console.log(res);
+        console.log(response);
       } catch (err) {
         console.log(err);
       }
