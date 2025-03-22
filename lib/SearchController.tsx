@@ -9,3 +9,12 @@ export async function makeRequest(opts: RequestOptions): Promise<RequestData> {
 
   return response?.data;
 }
+
+export async function storeSearchTerm(value: string): Promise<object> {
+  const response: AxiosResponse<RequestData> = await axios.put(
+    "/api/put-search-event",
+    { value }
+  );
+
+  return response?.data;
+}

@@ -1,23 +1,54 @@
-import { useEffect } from "react";
-import { makeRequest } from "@/lib/SearchController";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { makeRequest, storeSearchTerm } from "@/lib/SearchController";
+import { Debouncer, isBlank } from "@/lib/Utils";
 
 export default function Page() {
-  useEffect(() => {
-    async function callback() {
-      try {
-        const response = await makeRequest({
-          // search_text: "gold",
-          from: 1,
-          size: 10,
-        });
-        console.log(response);
-      } catch (err) {
-        console.log(err);
-      }
-    }
+  const [searchString, setSearchString] = useState("");
+  const [searchResults, setSearchResults] = useState({});
+  const searchDebounce = useRef(new Debouncer(350));
+  const searchStoreDebounce = useRef(new Debouncer(2000));
 
-    callback();
+  const doSearch = useCallback(async (value: string) => {
+    console.log("searching...", value);
+    try {
+      const r = await makeRequest({ search_text: value });
+      setSearchResults(r);
+    } catch (e) {
+      console.log(e);
+    }
   }, []);
 
-  return <>Hello world</>;
+  const storeSearch = useCallback(async (value: string) => {
+    console.log("storing...", value);
+    try {
+      const r = await storeSearchTerm(value);
+      console.log(r);
+    } catch (e) {
+      console.log(e);
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log("searchResults", searchResults);
+  }, [searchResults]);
+
+  function onSearchStringChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value.toLowerCase();
+    setSearchString(value);
+    if (isBlank(value)) return;
+
+    searchDebounce.current.start(async () => {
+      await doSearch(value);
+
+      searchStoreDebounce.current.start(() => {
+        storeSearch(value);
+      });
+    });
+  }
+
+  return (
+    <section className="w-[1000px] mx-auto py-20">
+      <input className="border" type="text" onChange={onSearchStringChange} />
+    </section>
+  );
 }
