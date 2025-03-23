@@ -4,11 +4,13 @@ import path from "path";
 import { Low } from "lowdb";
 import { JSONFile } from "lowdb/node";
 
-interface Database {
-  searchTerms: Array<{
-    text: string;
-    popularity: number;
-  }>;
+export interface DatabaseRecord {
+  text: string;
+  popularity: number;
+}
+
+export interface Database {
+  searchTerms: Array<DatabaseRecord>;
 }
 
 const file = path.join(process.cwd(), "db.json");
@@ -31,4 +33,12 @@ export async function addSearchTerm(value: string) {
   }
   await db.write();
   return item;
+}
+
+export async function getSearchTerms() {
+  await db.read();
+  const { searchTerms } = db.data;
+  return searchTerms.sort(function (a, b) {
+    return b.popularity - a.popularity;
+  });
 }

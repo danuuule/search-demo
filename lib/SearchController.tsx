@@ -10,10 +10,18 @@ export async function makeRequest(opts: RequestOptions): Promise<RequestData> {
   return response?.data;
 }
 
-export async function storeSearchTerm(value: string): Promise<object> {
+export async function storeSearchTerm(value: string): Promise<any> {
   const response: AxiosResponse<RequestData> = await axios.put(
     "/api/put-search-event",
     { value }
+  );
+
+  return response?.data;
+}
+
+export async function getSearchTerms(): Promise<object> {
+  const response: AxiosResponse<RequestData> = await axios.get(
+    "/api/get-search-terms"
   );
 
   return response?.data;
