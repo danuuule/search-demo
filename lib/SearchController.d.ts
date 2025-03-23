@@ -1,4 +1,5 @@
 import {
+  Kind,
   AssetCategories,
   InvestmentSuitability,
   ManagementApproach,
@@ -9,7 +10,7 @@ import {
 export interface RequestOptions {
   from?: number;
   size?: number;
-  kind?: Array<"etf" | "equity">;
+  kind?: Array<Kind>;
   search_text?: string;
   order_by?: string;
   //filters

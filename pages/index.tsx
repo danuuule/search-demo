@@ -11,6 +11,7 @@ import Image from "next/image";
 import SearchBox from "@/components/SearchBox";
 import { DatabaseRecord, getSearchTerms } from "@/lib/DatabaseController";
 import SearchGlass from "@/components/svg/SearchGlass";
+import ChevronDown from "@/components/svg/ChevronDown";
 
 export default function Page({
   searchTerms: _searchTerms,
@@ -23,7 +24,7 @@ export default function Page({
   const [searchResults, setSearchResults] = useState<RequestData>(
     {} as RequestData
   );
-  const [category, setCategory] = useState(undefined);
+  const [filters, setFilters] = useState({});
   // const searchDebounce = useRef(new Debouncer(350));
   // const searchStoreDebounce = useRef(new Debouncer(2000));
 
@@ -38,49 +39,50 @@ export default function Page({
     }
   }, []);
 
-  const doSearch = useCallback(
-    async (shouldStore: boolean = false, value: string = "") => {
-      if (isBlank(value)) {
-        value = searchString;
-      } else {
-        setSearchString(value);
+  async function doSearch(
+    shouldStore: boolean = false,
+    value: any = {},
+    forceRefresh: boolean = false
+  ) {
+    if (!value?.searchString) {
+      value = { ...value, searchString };
+    }
+    value.filters = { ...filters, ...(value?.filters || {}) };
+
+    if (isBlank(value.searchString)) {
+      setSearchResults({} as RequestData);
+      return;
+    }
+    if (!forceRefresh && value.searchString == _searchString.current) return;
+
+    _searchString.current = value.searchString;
+    console.log("searching...", value.searchString);
+    try {
+      const opts: RequestOptions = {};
+      if (value.searchString) {
+        opts["search_text"] = value.searchString;
       }
 
-      if (isBlank(value)) {
-        setSearchResults({} as RequestData);
-        return;
-      }
-      if (value == _searchString.current) return;
-      _searchString.current = value;
-      console.log("searching...", value);
-      try {
-        const opts: RequestOptions = {};
-        if (value) {
-          opts["search_text"] = value;
+      Object.keys(value.filters).forEach((key) => {
+        console.log(value.filters);
+        if (!isBlank(value.filters[key]?.value)) {
+          //@ts-ignore
+          opts[key] = value.filters[key].value;
         }
-        if (category) {
-          opts["asset_categories"] = [category];
-        }
+      });
 
-        const r = await makeRequest(opts);
-        setSearchResults(r);
+      const r = await makeRequest(opts);
+      setSearchResults(r);
 
-        if (shouldStore && r?.count) await storeSearch(value);
-      } catch (e) {
-        console.log(e);
-      }
-    },
-    [category, searchString, storeSearch]
-  );
+      if (shouldStore && r?.count) await storeSearch(value);
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   useEffect(() => {
     console.log("searchResults", searchResults);
   }, [searchResults]);
-
-  useEffect(() => {
-    console.log("category", category);
-    // doSearch();
-  }, [category]);
 
   useEffect(() => {
     if (isBlank(searchString)) {
@@ -98,6 +100,10 @@ export default function Page({
 
   function onSearchBoxChanged(value: string) {
     setSearchString(value.toLowerCase());
+  }
+
+  async function updateSearch(value: any = {}) {
+    await doSearch(false, value, true);
   }
 
   return (
@@ -129,7 +135,10 @@ export default function Page({
           {searchTerms.slice(0, 5).map((item, i) => (
             <li
               key={i}
-              onClick={() => doSearch(true, item.text)}
+              onClick={() => {
+                setSearchString(item.text);
+                doSearch(true, { searchString: item.text });
+              }}
               className="bg-white border border-slate-300 rounded-full px-4 leading-none py-1 text-sm flex gap-x-1 text-slate-500 cursor-pointer"
             >
               {item.text}
@@ -147,7 +156,11 @@ export default function Page({
       <div className="mt-4"></div>
       <div className="flex flex-col md:flex-row gap-4">
         <div className="w-full md:w-[400px] max-w-full">
-          <FilterPanel category={category} setCategory={setCategory} />
+          <FilterPanel
+            filters={filters}
+            setFilters={setFilters}
+            updateSearch={updateSearch}
+          />
         </div>
         <div className="grow bg-white rounded-md border border-slate-300">
           {(searchResults?.results || []).map((result, i) => (
@@ -160,33 +173,116 @@ export default function Page({
 }
 
 function FilterPanel({
-  category,
-  setCategory,
+  filters,
+  setFilters,
+  updateSearch,
 }: {
-  category: string | undefined;
-  setCategory: any;
+  filters: any;
+  setFilters: any;
+  updateSearch: any;
 }) {
+  function applyFilter(
+    key: string,
+    value: string | Array<string> | undefined,
+    isArray: boolean = false
+  ) {
+    const newValue = { valueKey: value, value: isArray ? [value] : value };
+    setFilters((s: any) => {
+      return {
+        ...s,
+        [key]: newValue,
+      };
+    });
+    updateSearch({ filters: { [key]: newValue } });
+  }
+
+  const filterList = [
+    {
+      label: "Kind",
+      key: "kind",
+      isArrayValue: true,
+      valueMap: { etf: "ETF", equity: "Equity" },
+    },
+    { label: "Category", key: "asset_categories", isArrayValue: true },
+    {
+      label: "Investment Suitability",
+      key: "investment_suitability",
+      isArrayValue: true,
+    },
+    {
+      label: "Management Approach",
+      key: "management_approach",
+      isArrayValue: true,
+    },
+    {
+      label: "Dividend Frequency",
+      key: "dividend_frequency",
+      isArrayValue: true,
+    },
+  ];
+
   return (
     <div className="w-full bg-white rounded-md border border-slate-300 p-4">
       <h2 className="strong font-bold text-xl">Refine</h2>
-      <label>
-        Category:{" "}
-        <select
-          value={category}
-          onChange={(e) => {
-            setCategory(e.target.value);
-          }}
-        >
-          <option disabled selected>
-            Select one
+      <div className="pt-2"></div>
+      {filterList.map((f, i) => (
+        <label key={i} className="text-sm block mb-2">
+          <div className="flex items-end mb-1">
+            <span className="block leading-none">{f.label}</span>
+            <div className="grow"></div>
+            <div
+              className={`border border-slate-300 py-0.5 px-1 rounded-md cursor-pointer ${
+                !filters?.[f.key]?.value ? "hidden" : ""
+              }`}
+              onClick={() => applyFilter(f.key, "")}
+            >
+              Clear
+            </div>
+          </div>
+          <SelectInput
+            value={filters?.[f.key]?.valueKey}
+            onChange={(value: string) => {
+              applyFilter(f.key, value, f.isArrayValue);
+            }}
+            //@ts-ignore
+            options={AvailableOptions?.[f.key]}
+            valueMap={f?.valueMap}
+          />
+        </label>
+      ))}
+    </div>
+  );
+}
+
+function SelectInput({
+  value,
+  options,
+  onChange,
+  valueMap,
+}: {
+  value: string;
+  options: any;
+  onChange: any;
+  valueMap: any;
+}) {
+  return (
+    <div className="relative border border-slate-300 rounded-md">
+      <select
+        defaultValue={""}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="appearance-none w-full bg-transparent pr-4 pl-2 h-[40px] outline-0"
+      >
+        <option value="" disabled>
+          Select one
+        </option>
+        {options.map((opt: string, i: number) => (
+          <option key={i} value={opt}>
+            {valueMap ? valueMap?.[opt] : opt}
           </option>
-          {AvailableOptions.asset_categories.map((cat, i) => (
-            <option key={i} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-      </label>
+        ))}
+      </select>
+      <ChevronDown className="w-[16px] h-full absolute top-0 right-2" />
     </div>
   );
 }

@@ -1,3 +1,4 @@
+export const kind = ["etf", "equity"];
 export const asset_categories = [
   "Australian Equities",
   "Cash",
@@ -43,6 +44,7 @@ export const management_fee = { min: 0.03, max: 2.54 };
 export const one_year_return = { min: -98.996488, max: 1400 };
 export const five_year_return = { min: -66.944885, max: 180.552869 };
 
+export type Kind = (typeof kind)[number];
 export type AssetCategories = (typeof asset_categories)[number];
 export type InvestmentSuitability = (typeof investment_suitability)[number];
 export type ManagementApproach = (typeof management_approach)[number];
