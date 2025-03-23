@@ -29,6 +29,7 @@ export default function Page({
   const limit = 5;
   const [paging, setPaging] = useState({ page: 1, count: 0 });
   const [loading, setLoading] = useState(false);
+  const [showResults, setShowResults] = useState(false);
   // const searchDebounce = useRef(new Debouncer(350));
   // const searchStoreDebounce = useRef(new Debouncer(2000));
 
@@ -62,6 +63,10 @@ export default function Page({
       value = { ...value, paging };
     }
     value.filters = { ...filters, ...(value?.filters || {}) };
+    if (value?.clearFilters) {
+      value.filters = {};
+      setFilters({});
+    }
 
     if (isBlank(value.searchString)) {
       setSearchResults({} as RequestData);
@@ -73,6 +78,7 @@ export default function Page({
     _searchString.current = value.searchString;
     console.log("searching...", value.searchString);
     try {
+      setShowResults(true);
       const opts: RequestOptions = {
         from: value.paging?.page || 1,
         size: limit,
@@ -118,14 +124,14 @@ export default function Page({
       setSearchResults({} as RequestData);
       _searchString.current = "";
       setPaging({ page: 1, count: 0 });
+      setShowResults(false);
       return;
     }
   }, [searchString]);
 
   function onSuggestionSelected(value: string) {
-    console.log("clicked", value);
     setSearchString(value.toLowerCase());
-    doSearch(true);
+    doSearch(true, { searchString: value });
   }
 
   function onSearchBoxChanged(value: string) {
@@ -186,7 +192,11 @@ export default function Page({
         </ul>
       </div>
       <div className="mt-4"></div>
-      <div className="flex flex-col md:flex-row gap-4">
+      <div
+        className={`flex flex-col md:flex-row gap-4 ${
+          !showResults ? "hidden" : ""
+        }`}
+      >
         <div className="w-full md:w-[400px] shrink-0 max-w-full">
           <FilterPanel
             filters={filters}
@@ -260,6 +270,9 @@ function FilterPanel({
     });
     updateSearch({ filters: { [key]: newValue } });
   }
+  function clearFilters() {
+    updateSearch({ clearFilters: true });
+  }
 
   const filterList = [
     {
@@ -299,7 +312,15 @@ function FilterPanel({
 
   return (
     <div className="w-full bg-white rounded-md border border-slate-300 p-4">
-      <h2 className="strong font-bold text-xl">Refine</h2>
+      <div className="flex justify-between">
+        <h2 className="strong font-bold text-xl">Refine</h2>
+        <div
+          className={`border border-slate-300 py-0.5 px-1 rounded-md cursor-pointer`}
+          onClick={clearFilters}
+        >
+          Clear all
+        </div>
+      </div>
       <div className="pt-2"></div>
       {filterList.map((f, i) => (
         <label key={i} className="text-sm block mb-2">
@@ -316,7 +337,7 @@ function FilterPanel({
             </div>
           </div>
           <SelectInput
-            value={filters?.[f.key]?.valueKey}
+            value={filters?.[f.key]?.valueKey || ""}
             onChange={(value: string) => {
               applyFilter(f.key, value, f.isArrayValue);
             }}
@@ -344,7 +365,6 @@ function SelectInput({
   return (
     <div className="relative border border-slate-300 rounded-md">
       <select
-        defaultValue={""}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="appearance-none w-full bg-transparent pr-4 pl-2 h-[40px] outline-0"

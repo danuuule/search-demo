@@ -1,27 +1,15 @@
 {
   "searchTerms": [
     {
-      "text": "betashares",
-      "popularity": 18
+      "text": "etf",
+      "popularity": 1
     },
     {
-      "text": "bitcoin",
+      "text": "betashares",
       "popularity": 5
     },
     {
-      "text": "beta",
-      "popularity": 21
-    },
-    {
       "text": "gold",
-      "popularity": 16
-    },
-    {
-      "text": "tesla",
-      "popularity": 2
-    },
-    {
-      "text": "super",
       "popularity": 1
     },
     {
@@ -29,59 +17,47 @@
       "popularity": 1
     },
     {
-      "text": "tesltra",
-      "popularity": 1
+      "text": "bitcoin",
+      "popularity": 3
+    },
+    {
+      "text": "qus",
+      "popularity": 2
     },
     {
       "text": "telstra",
-      "popularity": 12
-    },
-    {
-      "text": "telst",
       "popularity": 1
     },
     {
-      "text": "tel",
+      "text": "defence",
       "popularity": 1
     },
     {
-      "text": "betas",
-      "popularity": 1
-    },
-    {
-      "text": "apple",
-      "popularity": 1
+      "text": "australian shares",
+      "popularity": 4
     },
     {
       "text": "asx",
-      "popularity": 11
-    },
-    {
-      "text": "beta global",
       "popularity": 1
     },
     {
-      "text": "gol",
-      "popularity": 1
-    },
-    {
-      "text": "betash",
-      "popularity": 1
-    },
-    {
-      "text": "ethereum",
+      "text": "ethical",
       "popularity": 1
     },
     {
       "text": "usd",
-      "popularity": 2
-    },
-    {
-      "text": "tels",
       "popularity": 1
     },
     {
-      "text": "ether",
+      "text": "bond",
+      "popularity": 1
+    },
+    {
+      "text": "global",
+      "popularity": 1
+    },
+    {
+      "text": "betashares global",
       "popularity": 1
     }
   ]
