@@ -2,7 +2,7 @@
   "searchTerms": [
     {
       "text": "betashares",
-      "popularity": 13
+      "popularity": 18
     },
     {
       "text": "bitcoin",
@@ -34,7 +34,7 @@
     },
     {
       "text": "telstra",
-      "popularity": 11
+      "popularity": 12
     },
     {
       "text": "telst",
@@ -54,7 +54,7 @@
     },
     {
       "text": "asx",
-      "popularity": 10
+      "popularity": 11
     },
     {
       "text": "beta global",
@@ -77,190 +77,11 @@
       "popularity": 2
     },
     {
-      "text": {
-        "searchString": "gold"
-      },
+      "text": "tels",
       "popularity": 1
     },
     {
-      "text": {
-        "searchString": "gold"
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares"
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares"
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares"
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {}
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {
-          "category": "Cash"
-        }
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares"
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {}
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {
-          "category": "Cash"
-        }
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {}
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {}
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {}
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {}
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {}
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {}
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {}
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {}
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {}
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {}
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {}
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {
-          "asset_categories": {
-            "valueKey": "Financial",
-            "value": [
-              "Financial"
-            ]
-          }
-        }
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {}
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {}
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {}
-      },
-      "popularity": 1
-    },
-    {
-      "text": {
-        "searchString": "betashares",
-        "filters": {}
-      },
+      "text": "ether",
       "popularity": 1
     }
   ]

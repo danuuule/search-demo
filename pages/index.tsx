@@ -12,6 +12,7 @@ import SearchBox from "@/components/SearchBox";
 import { DatabaseRecord, getSearchTerms } from "@/lib/DatabaseController";
 import SearchGlass from "@/components/svg/SearchGlass";
 import ChevronDown from "@/components/svg/ChevronDown";
+import Refresh from "@/components/svg/Refresh";
 
 export default function Page({
   searchTerms: _searchTerms,
@@ -25,6 +26,9 @@ export default function Page({
     {} as RequestData
   );
   const [filters, setFilters] = useState({});
+  const limit = 5;
+  const [paging, setPaging] = useState({ page: 1, count: 0 });
+  const [loading, setLoading] = useState(false);
   // const searchDebounce = useRef(new Debouncer(350));
   // const searchStoreDebounce = useRef(new Debouncer(2000));
 
@@ -42,10 +46,20 @@ export default function Page({
   async function doSearch(
     shouldStore: boolean = false,
     value: any = {},
-    forceRefresh: boolean = false
+    forceRefresh: boolean = false,
+    appendResults: boolean = false
   ) {
+    if (loading) return;
+
+    if (!appendResults) {
+      setPaging({ page: 1, count: 0 });
+      setSearchResults({} as RequestData);
+    }
     if (!value?.searchString) {
       value = { ...value, searchString };
+    }
+    if (!value?.paging) {
+      value = { ...value, paging };
     }
     value.filters = { ...filters, ...(value?.filters || {}) };
 
@@ -54,11 +68,15 @@ export default function Page({
       return;
     }
     if (!forceRefresh && value.searchString == _searchString.current) return;
+    setLoading(true);
 
     _searchString.current = value.searchString;
     console.log("searching...", value.searchString);
     try {
-      const opts: RequestOptions = {};
+      const opts: RequestOptions = {
+        from: value.paging?.page || 1,
+        size: limit,
+      };
       if (value.searchString) {
         opts["search_text"] = value.searchString;
       }
@@ -72,12 +90,23 @@ export default function Page({
       });
 
       const r = await makeRequest(opts);
-      setSearchResults(r);
+      if (appendResults) {
+        setSearchResults((s: any) => {
+          return { ...s, results: [...s.results, ...r.results] };
+        });
+      } else {
+        setSearchResults(r);
+      }
+      setPaging((s: any) => {
+        return { ...s, count: r.count };
+      });
 
-      if (shouldStore && r?.count) await storeSearch(value);
+      if (shouldStore && r?.count && !isBlank(value?.searchString))
+        await storeSearch(value.searchString);
     } catch (e) {
       console.log(e);
     }
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -88,6 +117,7 @@ export default function Page({
     if (isBlank(searchString)) {
       setSearchResults({} as RequestData);
       _searchString.current = "";
+      setPaging({ page: 1, count: 0 });
       return;
     }
   }, [searchString]);
@@ -104,6 +134,14 @@ export default function Page({
 
   async function updateSearch(value: any = {}) {
     await doSearch(false, value, true);
+  }
+
+  async function nextPage() {
+    const newValue = { ...paging, page: paging.page + 1 };
+    await doSearch(false, { paging: newValue }, true, true);
+    setPaging(() => {
+      return newValue;
+    });
   }
 
   return (
@@ -147,15 +185,9 @@ export default function Page({
           ))}
         </ul>
       </div>
-      {/* <input
-        className="rounded-md bg-white border border-slate-300 w-full p-4 text-lg outline-0"
-        type="text"
-        onChange={onSearchStringChange}
-        placeholder="Search..."
-      /> */}
       <div className="mt-4"></div>
       <div className="flex flex-col md:flex-row gap-4">
-        <div className="w-full md:w-[400px] max-w-full">
+        <div className="w-full md:w-[400px] shrink-0 max-w-full">
           <FilterPanel
             filters={filters}
             setFilters={setFilters}
@@ -166,6 +198,39 @@ export default function Page({
           {(searchResults?.results || []).map((result, i) => (
             <ResultBlock key={i} result={result} />
           ))}
+          {loading && (
+            <div className="flex items-center justify-center p-4">
+              <Refresh className="animate-spin" />
+            </div>
+          )}
+          <div className="p-4 flex flex-col items-center gap-2">
+            {paging.count > 0 ? (
+              <>
+                <span className="italic">
+                  Showing{" "}
+                  {paging.page * limit >= paging.count
+                    ? paging.count
+                    : paging.page * limit}{" "}
+                  out of {paging.count} results
+                </span>
+                <button
+                  className="bg-black rounded-md px-4 py-2 text-white disabled:bg-slate-300 cursor-pointer disabled:cursor-not-allowed"
+                  disabled={paging.page * limit >= paging.count}
+                  onClick={nextPage}
+                >
+                  Load more
+                </button>
+              </>
+            ) : (
+              <>
+                {!loading && (
+                  <span className="italic">
+                    No results found, please try another search.
+                  </span>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </div>
     </section>
@@ -197,6 +262,17 @@ function FilterPanel({
   }
 
   const filterList = [
+    {
+      label: "Order By",
+      key: "order_by",
+      isArrayValue: false,
+      valueMap: {
+        "one_year_return.desc": "1 year return (High - Low)",
+        "one_year_return.asc": "1 year return (Low - High)",
+        "five_year_return.desc": "5 year return (High - Low)",
+        "five_year_return.asc": "5 year return (Low - High)",
+      },
+    },
     {
       label: "Kind",
       key: "kind",

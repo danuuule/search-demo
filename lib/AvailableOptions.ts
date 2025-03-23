@@ -39,6 +39,12 @@ export const dividend_frequency = [
   "Semiannually",
   "Annually",
 ] as const;
+export const order_by = [
+  "one_year_return.desc",
+  "one_year_return.asc",
+  "five_year_return.desc",
+  "five_year_return.asc",
+];
 export const fund_size = { min: 0.49247, max: 1807344.339257 };
 export const management_fee = { min: 0.03, max: 2.54 };
 export const one_year_return = { min: -98.996488, max: 1400 };
