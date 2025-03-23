@@ -1,40 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Search Demo
+> Built by Daniel Gray for betashares coding test 2025
 
-## Getting Started
+## Getting started
+1. Clone the repository `git clone https://github.com/danuuule/search-demo.git`
+2. Install dependencies `npm install`
+3. Run the application `npm run dev`
+4. Open application in your browser `http://localhost:3000/`
+5. Try searching for `betashares`
 
-First, run the development server:
+## Structure
+This application is built ontop of next.js. This framework is great for building fullstack react applications and offers server side rendering where needed.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**The most interesting place to start** is `./pages/index.tsx`. This is the core of the application.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- `./components` - contains some components used in the application as well as svg icon components. Some of the components in the page could be moved here.
+- `./lib` - contains services and utility functions (interfacing with search api and local json db)
+- `./pages` - contains the routes that are accessible via the browser (currently just `index.tsx`)
+- `./pages/api` - contains api endpoints
+- `./styles/globals.css` - includes tailwind and some styles for the autosuggest component
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+## Features
+- **Autosuggest** - when typing in the search field: presents relevant options that have been searched before, ranked by popularity (amount of times searched).
+  - The library `react-autosuggest` was leveraged for this.
+  - Integrated `lowdb` to manage a local json database file `db.json`. Terms searched for (that generate results) are stored in here. If the search term already exists in the db the popularity is increased.
+- **Quick search terms** - show 5 most popular search terms from the db
+- **Refinements panel** (filters) - refine the search results with additional filters. There are more that could be put here.
+- **Search results** - Shows a snapshot of relevant data from the search results. This could be extended to click on the result and show a more detail.
+- **Pagination** - Shows 5 search results at a time (this would be increased in production). There is  a button to load more which calls the search api again. Pagination is important to make sure the server and client are not being overloaded.
+- **TypeScript** - Have used TypeScript to make sure key variables have the correct data types / structures. My TypeScript could be better implemented with more time but hopefully you can get the idea and see the structures I have tried to put in place.

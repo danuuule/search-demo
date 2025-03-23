@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
+import Head from "next/head";
 import { makeRequest, storeSearchTerm } from "@/lib/SearchController";
 import { Debouncer, isBlank } from "@/lib/Utils";
 import {
@@ -151,99 +152,105 @@ export default function Page({
   }
 
   return (
-    <section className="w-[1000px] max-w-full mx-auto py-20 px-4 md:px-8">
-      <form
-        className="flex gap-x-4"
-        onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
-          event.preventDefault();
-          doSearch(true);
-        }}
-      >
-        <SearchBox
-          searchString={searchString}
-          setSearchString={setSearchString}
-          searchTerms={searchTerms}
-          onSuggestionSelected={onSuggestionSelected}
-          onChange={onSearchBoxChanged}
-        />
-        <button
-          type="submit"
-          className="cursor-pointer bg-orange font-bold text-lg text-white px-8 h-[45px] rounded-md"
+    <>
+      {" "}
+      <Head>
+        <title>Betashares search</title>
+      </Head>
+      <section className="w-[1000px] max-w-full mx-auto py-20 px-4 md:px-8">
+        <form
+          className="flex gap-x-4"
+          onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+            event.preventDefault();
+            doSearch(true);
+          }}
         >
-          Search
-        </button>
-      </form>
-      <div className="flex items-center gap-1 flex-wrap mt-2">
-        <span className="text-sm italic text-slate-500">Try searching:</span>
-        <ul className="flex flex-wrap gap-2">
-          {searchTerms.slice(0, 5).map((item, i) => (
-            <li
-              key={i}
-              onClick={() => {
-                setSearchString(item.text);
-                doSearch(true, { searchString: item.text });
-              }}
-              className="bg-white border border-slate-300 rounded-full px-4 leading-none py-1 text-sm flex gap-x-1 text-slate-500 cursor-pointer"
-            >
-              {item.text}
-              <SearchGlass className="w-[14px] h-[14px] fill-slate-500" />
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="mt-4"></div>
-      <div
-        className={`flex flex-col md:flex-row gap-4 ${
-          !showResults ? "hidden" : ""
-        }`}
-      >
-        <div className="w-full md:w-[400px] shrink-0 max-w-full">
-          <FilterPanel
-            filters={filters}
-            setFilters={setFilters}
-            updateSearch={updateSearch}
+          <SearchBox
+            searchString={searchString}
+            setSearchString={setSearchString}
+            searchTerms={searchTerms}
+            onSuggestionSelected={onSuggestionSelected}
+            onChange={onSearchBoxChanged}
           />
+          <button
+            type="submit"
+            className="cursor-pointer bg-orange font-bold text-lg text-white px-8 h-[45px] rounded-md"
+          >
+            Search
+          </button>
+        </form>
+        <div className="flex items-center gap-1 flex-wrap mt-2">
+          <span className="text-sm italic text-slate-500">Try searching:</span>
+          <ul className="flex flex-wrap gap-2">
+            {searchTerms.slice(0, 5).map((item, i) => (
+              <li
+                key={i}
+                onClick={() => {
+                  setSearchString(item.text);
+                  doSearch(true, { searchString: item.text });
+                }}
+                className="bg-white border border-slate-300 rounded-full px-4 leading-none py-1 text-sm flex gap-x-1 text-slate-500 cursor-pointer"
+              >
+                {item.text}
+                <SearchGlass className="w-[14px] h-[14px] fill-slate-500" />
+              </li>
+            ))}
+          </ul>
         </div>
-        <div className="grow bg-white rounded-md border border-slate-300">
-          {(searchResults?.results || []).map((result, i) => (
-            <ResultBlock key={i} result={result} />
-          ))}
-          {loading && (
-            <div className="flex items-center justify-center p-4">
-              <Refresh className="animate-spin" />
-            </div>
-          )}
-          <div className="p-4 flex flex-col items-center gap-2">
-            {paging.count > 0 ? (
-              <>
-                <span className="italic">
-                  Showing{" "}
-                  {paging.page * limit >= paging.count
-                    ? paging.count
-                    : paging.page * limit}{" "}
-                  out of {paging.count} results
-                </span>
-                <button
-                  className="bg-black rounded-md px-4 py-2 text-white disabled:bg-slate-300 cursor-pointer disabled:cursor-not-allowed"
-                  disabled={paging.page * limit >= paging.count}
-                  onClick={nextPage}
-                >
-                  Load more
-                </button>
-              </>
-            ) : (
-              <>
-                {!loading && (
-                  <span className="italic">
-                    No results found, please try another search.
-                  </span>
-                )}
-              </>
+        <div className="mt-4"></div>
+        <div
+          className={`flex flex-col md:flex-row gap-4 ${
+            !showResults ? "hidden" : ""
+          }`}
+        >
+          <div className="w-full md:w-[400px] shrink-0 max-w-full">
+            <FilterPanel
+              filters={filters}
+              setFilters={setFilters}
+              updateSearch={updateSearch}
+            />
+          </div>
+          <div className="grow bg-white rounded-md border border-slate-300">
+            {(searchResults?.results || []).map((result, i) => (
+              <ResultBlock key={i} result={result} />
+            ))}
+            {loading && (
+              <div className="flex items-center justify-center p-4">
+                <Refresh className="animate-spin" />
+              </div>
             )}
+            <div className="p-4 flex flex-col items-center gap-2">
+              {paging.count > 0 ? (
+                <>
+                  <span className="italic">
+                    Showing{" "}
+                    {paging.page * limit >= paging.count
+                      ? paging.count
+                      : paging.page * limit}{" "}
+                    out of {paging.count} results
+                  </span>
+                  <button
+                    className="bg-black rounded-md px-4 py-2 text-white disabled:bg-slate-300 cursor-pointer disabled:cursor-not-allowed"
+                    disabled={paging.page * limit >= paging.count}
+                    onClick={nextPage}
+                  >
+                    Load more
+                  </button>
+                </>
+              ) : (
+                <>
+                  {!loading && (
+                    <span className="italic">
+                      No results found, please try another search.
+                    </span>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
 
