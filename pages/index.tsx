@@ -88,10 +88,9 @@ export default function Page({
         opts["search_text"] = value.searchString;
       }
 
-      Object.keys(value.filters).forEach((key) => {
-        console.log(value.filters);
+      Object.keys(value.filters).forEach((_key) => {
+        const key = _key as keyof RequestOptions;
         if (!isBlank(value.filters[key]?.value)) {
-          //@ts-ignore
           opts[key] = value.filters[key].value;
         }
       });
